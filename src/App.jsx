@@ -4,66 +4,70 @@ const previewThemes = {
   classic: {
     name: "Classic",
     pageBg: "bg-stone-100",
-    panelBg: "bg-white",
     sectionBg: "bg-white",
     cardBg: "bg-white",
+    accentBg: "bg-stone-50",
     text: "text-neutral-800",
     subtext: "text-neutral-600",
     border: "border-neutral-200",
     ring: "ring-black/5",
     button: "border-neutral-300 hover:bg-neutral-50",
     heroOverlay: "from-black/65 via-black/20 to-transparent",
-    badge: "bg-white/85 text-neutral-800",
-    softBg: "bg-neutral-50",
-    timeText: "text-neutral-500",
+    badge: "bg-white/90 text-neutral-800",
+    accent: "text-amber-700",
+    softLine: "bg-neutral-200",
+    chip: "bg-neutral-100 text-neutral-700",
   },
   pop: {
     name: "Pop",
     pageBg: "bg-rose-50",
-    panelBg: "bg-white",
     sectionBg: "bg-white",
     cardBg: "bg-white",
+    accentBg: "bg-rose-50",
     text: "text-neutral-800",
     subtext: "text-neutral-600",
     border: "border-rose-200",
     ring: "ring-rose-200/60",
     button: "border-rose-300 hover:bg-rose-50",
     heroOverlay: "from-pink-600/65 via-orange-300/25 to-transparent",
-    badge: "bg-yellow-100/90 text-rose-700",
-    softBg: "bg-rose-50",
-    timeText: "text-rose-500",
+    badge: "bg-yellow-100/95 text-rose-700",
+    accent: "text-rose-600",
+    softLine: "bg-rose-200",
+    chip: "bg-rose-100 text-rose-700",
   },
   natural: {
     name: "Natural",
     pageBg: "bg-emerald-50",
-    panelBg: "bg-white",
     sectionBg: "bg-white",
     cardBg: "bg-white",
+    accentBg: "bg-emerald-50",
     text: "text-neutral-800",
     subtext: "text-neutral-600",
     border: "border-emerald-200",
     ring: "ring-emerald-200/60",
     button: "border-emerald-300 hover:bg-emerald-50",
     heroOverlay: "from-emerald-900/60 via-lime-700/20 to-transparent",
-    badge: "bg-emerald-100/90 text-emerald-800",
-    softBg: "bg-emerald-50",
-    timeText: "text-emerald-600",
+    badge: "bg-emerald-100/95 text-emerald-800",
+    accent: "text-emerald-700",
+    softLine: "bg-emerald-200",
+    chip: "bg-emerald-100 text-emerald-700",
   },
   sky: {
     name: "Sky",
     pageBg: "bg-sky-50",
-    panelBg: "bg-white",
     sectionBg: "bg-white",
     cardBg: "bg-white",
+    accentBg: "bg-sky-50",
     text: "text-neutral-800",
     subtext: "text-neutral-600",
     border: "border-sky-200",
     ring: "ring-sky-200/60",
     button: "border-sky-300 hover:bg-sky-50",
     heroOverlay: "from-sky-900/65 via-cyan-500/20 to-transparent",
-    badge: "bg-sky-100/90 text-sky-800",
-    softBg: "bg-sky-50",
-    timeText: "text-sky-600",
+    badge: "bg-sky-100/95 text-sky-800",
+    accent: "text-sky-700",
+    softLine: "bg-sky-200",
+    chip: "bg-sky-100 text-sky-700",
   },
 };
 
@@ -285,7 +289,6 @@ function App() {
 
   const handleImageUpload = (dayIndex, itemIndex, file) => {
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
       updateScheduleField(dayIndex, itemIndex, "image", reader.result);
@@ -737,125 +740,154 @@ function App() {
 
   const renderHeroSection = () => (
     <section
-      className={`overflow-hidden rounded-[28px] ${theme.sectionBg} shadow-sm ring-1 ${theme.ring}`}
+      className={`overflow-hidden rounded-[32px] ${theme.sectionBg} shadow-sm ring-1 ${theme.ring}`}
     >
-      <div className="relative h-[320px] w-full md:h-[430px]">
+      <div className="relative h-[360px] w-full md:h-[500px]">
         <img
           src={trip.coverImage}
           alt={trip.title}
           className="h-full w-full object-cover"
         />
         <div className={`absolute inset-0 bg-gradient-to-t ${theme.heroOverlay}`} />
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white md:p-8">
-          <span
-            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${theme.badge}`}
-          >
-            {theme.name}
-          </span>
-          <p className="mt-3 text-sm tracking-[0.2em] uppercase opacity-90">
-            Travel Book
-          </p>
-          <h1 className="text-3xl font-bold md:text-5xl">{trip.title}</h1>
-          <p className="mt-2 text-sm md:text-lg">{trip.subtitle}</p>
-          <p className="mt-1 text-sm opacity-90">{trip.date}</p>
+        <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-10">
+          <div className="max-w-3xl">
+            <span
+              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold tracking-wide ${theme.badge}`}
+            >
+              {theme.name}
+            </span>
+            <p className="mt-4 text-xs tracking-[0.35em] uppercase opacity-90 md:text-sm">
+              Travel Pamphlet
+            </p>
+            <h1 className="mt-3 text-4xl font-bold leading-tight md:text-6xl">
+              {trip.title}
+            </h1>
+            <p className="mt-3 text-base opacity-95 md:text-xl">{trip.subtitle}</p>
+            <p className="mt-2 text-sm opacity-90 md:text-base">{trip.date}</p>
+          </div>
         </div>
       </div>
 
-      <div className="p-6 md:p-8">
-        <p className={`leading-7 ${theme.subtext}`}>{trip.description}</p>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={copyShareUrl}
-            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
-          >
-            🔗 共有URLをコピー
-          </button>
-
-          {trip.photoAlbumUrl && (
-            <a
-              href={trip.photoAlbumUrl}
-              target="_blank"
-              rel="noreferrer"
-              className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
-            >
-              📸 Googleフォトを見る
-            </a>
-          )}
+      <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_0.8fr] md:p-10">
+        <div>
+          <p className={`text-sm tracking-[0.25em] uppercase ${theme.accent}`}>
+            Introduction
+          </p>
+          <p className={`mt-3 text-base leading-8 ${theme.subtext}`}>
+            {trip.description}
+          </p>
         </div>
 
-        {copied && (
-          <p className="mt-3 text-sm text-emerald-500">
-            共有URLをコピーしました！
-          </p>
-        )}
+        <div className={`rounded-3xl ${theme.accentBg} p-5`}>
+          <p className={`text-sm font-semibold ${theme.accent}`}>Quick Access</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={copyShareUrl}
+              className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
+            >
+              🔗 共有URLをコピー
+            </button>
+
+            {trip.photoAlbumUrl && (
+              <a
+                href={trip.photoAlbumUrl}
+                target="_blank"
+                rel="noreferrer"
+                className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
+              >
+                📸 Googleフォトを見る
+              </a>
+            )}
+          </div>
+
+          {copied && (
+            <p className="mt-3 text-sm text-emerald-500">
+              共有URLをコピーしました！
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
 
   const renderSchedulePreview = () => (
     <section
-      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
+      className={`rounded-[32px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-10`}
     >
-      <h2 className="mb-6 text-2xl font-bold">日程</h2>
+      <div className="mb-8 md:flex md:items-end md:justify-between">
+        <div>
+          <p className={`text-sm tracking-[0.25em] uppercase ${theme.accent}`}>
+            Schedule
+          </p>
+          <h2 className="mt-2 text-3xl font-bold">旅のスケジュール</h2>
+        </div>
+        <div className={`mt-4 h-px w-full md:mt-0 md:ml-6 ${theme.softLine}`} />
+      </div>
 
-      <div className="space-y-8">
+      <div className="space-y-12">
         {trip.days.map((day, dayIndex) => (
           <div key={dayIndex}>
-            <h3 className="mb-4 text-xl font-semibold">{day.dayTitle}</h3>
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${theme.chip}`}>
+                DAY {dayIndex + 1}
+              </span>
+              <h3 className="text-2xl font-bold">{day.dayTitle}</h3>
+            </div>
 
             <div className="space-y-5">
               {day.schedule.map((item, itemIndex) => (
-                <div
+                <article
                   key={itemIndex}
-                  className={`overflow-hidden rounded-2xl border ${theme.border} ${theme.cardBg}`}
+                  className={`overflow-hidden rounded-[28px] border ${theme.border} ${theme.cardBg}`}
                 >
-                  <div className="grid gap-0 md:grid-cols-[110px_1fr]">
-                    <div
-                      className={`border-b px-4 py-4 text-sm font-semibold md:border-b-0 md:border-r ${theme.border} ${theme.timeText}`}
-                    >
-                      {item.time || "時間未定"}
+                  <div className="grid md:grid-cols-[110px_1fr]">
+                    <div className={`border-b px-5 py-5 md:border-b-0 md:border-r ${theme.border}`}>
+                      <div className={`text-sm font-semibold ${theme.timeText}`}>
+                        {item.time || "時間未定"}
+                      </div>
                     </div>
 
-                    <div className="p-4 md:p-5">
-                      <h4 className="text-lg font-semibold">
-                        {item.place || "場所未設定"}
-                      </h4>
+                    <div className="p-5 md:p-6">
+                      <div className={item.image ? "grid gap-5 lg:grid-cols-[1fr_320px]" : ""}>
+                        <div>
+                          <h4 className="text-xl font-semibold">
+                            {item.place || "場所未設定"}
+                          </h4>
 
-                      {item.note && (
-                        <p
-                          className={`mt-2 whitespace-pre-wrap text-sm leading-6 ${theme.subtext}`}
-                        >
-                          {item.note}
-                        </p>
-                      )}
+                          {item.note && (
+                            <p className={`mt-3 whitespace-pre-wrap text-sm leading-7 ${theme.subtext}`}>
+                              {item.note}
+                            </p>
+                          )}
 
-                      {item.link && (
-                        <div className="mt-3">
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`inline-flex rounded-full border px-3 py-1 text-xs ${theme.button}`}
-                          >
-                            詳細を見る
-                          </a>
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {item.link && (
+                              <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`inline-flex rounded-full border px-4 py-2 text-xs ${theme.button}`}
+                              >
+                                詳細を見る
+                              </a>
+                            )}
+                          </div>
                         </div>
-                      )}
 
-                      {item.image && (
-                        <div className="mt-4">
-                          <img
-                            src={item.image}
-                            alt={item.place || `予定 ${itemIndex + 1} の写真`}
-                            className="h-56 w-full rounded-2xl object-cover md:h-72"
-                          />
-                        </div>
-                      )}
+                        {item.image && (
+                          <div>
+                            <img
+                              src={item.image}
+                              alt={item.place || `予定 ${itemIndex + 1} の写真`}
+                              className="h-64 w-full rounded-3xl object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </div>
@@ -866,24 +898,37 @@ function App() {
 
   const renderPackingPreview = () => (
     <section
-      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
+      className={`rounded-[32px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-10`}
     >
-      <h2 className="mb-5 text-2xl font-bold">持ち物</h2>
+      <div className="mb-8 md:flex md:items-end md:justify-between">
+        <div>
+          <p className={`text-sm tracking-[0.25em] uppercase ${theme.accent}`}>
+            Packing List
+          </p>
+          <h2 className="mt-2 text-3xl font-bold">持ち物メモ</h2>
+        </div>
+        <div className={`mt-4 h-px w-full md:mt-0 md:ml-6 ${theme.softLine}`} />
+      </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {trip.packingItems.map((item, index) => (
           <div
             key={index}
-            className={`rounded-2xl border p-4 ${theme.border} ${theme.cardBg}`}
+            className={`rounded-[24px] border ${theme.border} ${theme.cardBg} p-5`}
           >
-            <div className="text-base font-semibold">
-              {item.name || `持ち物 ${index + 1}`}
+            <div className="flex items-start gap-3">
+              <div className={`mt-1 h-3 w-3 rounded-full ${theme.softLine}`} />
+              <div>
+                <div className="text-lg font-semibold">
+                  {item.name || `持ち物 ${index + 1}`}
+                </div>
+                {item.note && (
+                  <p className={`mt-2 text-sm leading-7 ${theme.subtext}`}>
+                    {item.note}
+                  </p>
+                )}
+              </div>
             </div>
-            {item.note && (
-              <p className={`mt-2 text-sm leading-6 ${theme.subtext}`}>
-                {item.note}
-              </p>
-            )}
           </div>
         ))}
       </div>
@@ -892,38 +937,54 @@ function App() {
 
   const renderGooglePhotoPreview = () => (
     <section
-      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
+      className={`rounded-[32px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-10`}
     >
-      <h2 className="mb-3 text-2xl font-bold">Googleフォト</h2>
-
-      {trip.photoAlbumUrl ? (
-        <>
-          <p className={`mb-4 text-sm leading-6 ${theme.subtext}`}>
-            思い出アルバムをGoogleフォトで開けます。
+      <div className="mb-8 md:flex md:items-end md:justify-between">
+        <div>
+          <p className={`text-sm tracking-[0.25em] uppercase ${theme.accent}`}>
+            Memories
           </p>
-          <a
-            href={trip.photoAlbumUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
-          >
-            📸 Googleフォトを見る
-          </a>
-        </>
-      ) : (
-        <p className={`text-sm leading-6 ${theme.subtext}`}>
-          まだGoogleフォトのリンクが入っていません。
-        </p>
-      )}
+          <h2 className="mt-2 text-3xl font-bold">思い出アルバム</h2>
+        </div>
+        <div className={`mt-4 h-px w-full md:mt-0 md:ml-6 ${theme.softLine}`} />
+      </div>
+
+      <div className={`rounded-[28px] ${theme.accentBg} p-6`}>
+        {trip.photoAlbumUrl ? (
+          <>
+            <p className={`text-sm leading-7 ${theme.subtext}`}>
+              写真はGoogleフォトにもまとめています。旅の思い出を、あとからゆっくり眺める用のアルバムです。
+            </p>
+            <div className="mt-5">
+              <a
+                href={trip.photoAlbumUrl}
+                target="_blank"
+                rel="noreferrer"
+                className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
+              >
+                📸 Googleフォトを見る
+              </a>
+            </div>
+          </>
+        ) : (
+          <p className={`text-sm leading-7 ${theme.subtext}`}>
+            まだGoogleフォトのリンクが入っていません。
+          </p>
+        )}
+      </div>
     </section>
   );
 
   return (
-    <div className={mode === "edit" ? "min-h-screen bg-neutral-100 text-neutral-800" : `min-h-screen ${theme.pageBg} ${theme.text} transition-colors duration-300`}>
+    <div
+      className={
+        mode === "edit"
+          ? "min-h-screen bg-neutral-100 text-neutral-800"
+          : `min-h-screen ${theme.pageBg} ${theme.text} transition-colors duration-300`
+      }
+    >
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
-        <div className="mb-6">
-          {renderModeSwitcher()}
-        </div>
+        <div className="mb-6">{renderModeSwitcher()}</div>
 
         {mode === "edit" ? (
           <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
@@ -934,60 +995,98 @@ function App() {
             </aside>
 
             <main className="space-y-6">
-              <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-                <h2 className="text-2xl font-bold text-neutral-900">編集メモ</h2>
-                <div className="mt-4 space-y-3 text-sm leading-7 text-neutral-600">
-                  <p>
-                    ここは編集専用の画面です。入力や画像追加に集中できるように、
-                    あえて完成版は分けています。
-                  </p>
-                  <p>
-                    右上の <span className="font-semibold">完成モード</span> を押すと、
-                    当日に見やすいしおり表示に切り替わります。
-                  </p>
-                  <p>
-                    共有URLを送った相手は、最初から完成モードで開くようになっています。
-                  </p>
+              <section className="overflow-hidden rounded-[32px] bg-white shadow-sm ring-1 ring-black/5">
+                <div className="relative h-[280px] md:h-[360px]">
+                  <img
+                    src={trip.coverImage}
+                    alt={trip.title}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white md:p-8">
+                    <p className="text-xs tracking-[0.3em] uppercase opacity-90">
+                      Preview Style
+                    </p>
+                    <h2 className="mt-2 text-3xl font-bold md:text-5xl">
+                      {trip.title}
+                    </h2>
+                    <p className="mt-2 text-sm md:text-lg">{trip.subtitle}</p>
+                    <p className="mt-1 text-sm opacity-90">{trip.date}</p>
+                  </div>
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setMode("preview")}
-                    className="rounded-full bg-neutral-900 px-5 py-2 text-sm text-white hover:opacity-90"
-                  >
-                    完成モードで見る
-                  </button>
+                <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
+                  <div>
+                    <p className="text-sm tracking-[0.25em] uppercase text-neutral-500">
+                      Editing
+                    </p>
+                    <p className="mt-3 text-sm leading-8 text-neutral-600">
+                      ここは編集専用の画面です。完成版の華やかさは残しつつ、
+                      入力側はごちゃつかないように分けています。
+                    </p>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={copyShareUrl}
-                    className="rounded-full border border-neutral-300 px-5 py-2 text-sm hover:bg-neutral-50"
-                  >
-                    🔗 共有URLをコピー
-                  </button>
+                  <div className="rounded-3xl bg-neutral-50 p-5">
+                    <p className="text-sm font-semibold text-neutral-700">
+                      Quick Action
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setMode("preview")}
+                        className="rounded-full bg-neutral-900 px-5 py-2 text-sm text-white hover:opacity-90"
+                      >
+                        完成モードで見る
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={copyShareUrl}
+                        className="rounded-full border border-neutral-300 px-5 py-2 text-sm hover:bg-neutral-50"
+                      >
+                        🔗 共有URLをコピー
+                      </button>
+                    </div>
+
+                    {copied && (
+                      <p className="mt-3 text-sm text-emerald-600">
+                        共有URLをコピーしました！
+                      </p>
+                    )}
+                  </div>
                 </div>
-
-                {copied && (
-                  <p className="mt-3 text-sm text-emerald-600">
-                    共有URLをコピーしました！
-                  </p>
-                )}
               </section>
 
-              <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-                <h2 className="text-xl font-bold text-neutral-900">選べる完成テーマ</h2>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <section className="rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-black/5 md:p-8">
+                <div className="mb-6 md:flex md:items-end md:justify-between">
+                  <div>
+                    <p className="text-sm tracking-[0.25em] uppercase text-neutral-500">
+                      Themes
+                    </p>
+                    <h2 className="mt-2 text-2xl font-bold text-neutral-900">
+                      完成画面のテーマ
+                    </h2>
+                  </div>
+                  <div className="mt-4 h-px w-full bg-neutral-200 md:mt-0 md:ml-6" />
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
                   {Object.values(previewThemes).map((item) => (
                     <div
                       key={item.name}
-                      className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4"
+                      className="rounded-[24px] border border-neutral-200 bg-neutral-50 p-5"
                     >
-                      <div className="text-base font-semibold text-neutral-900">
-                        {item.name}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-lg font-semibold text-neutral-900">
+                          {item.name}
+                        </div>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs text-neutral-600">
+                          theme
+                        </span>
                       </div>
-                      <p className="mt-2 text-sm text-neutral-600">
-                        完成モードに切り替えたときの表示テーマです。
+                      <p className="mt-3 text-sm leading-7 text-neutral-600">
+                        完成モードの見た目に反映されます。パンフっぽさを残しつつ、
+                        旅の雰囲気に合わせて選べます。
                       </p>
                     </div>
                   ))}
@@ -997,7 +1096,7 @@ function App() {
           </div>
         ) : (
           <main className="space-y-6">
-            <div className={`rounded-3xl ${theme.panelBg} p-4 shadow-sm ring-1 ${theme.ring}`}>
+            <div className={`rounded-3xl ${theme.sectionBg} p-4 shadow-sm ring-1 ${theme.ring}`}>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
