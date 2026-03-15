@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const themes = {
+const previewThemes = {
   classic: {
     name: "Classic",
     pageBg: "bg-stone-100",
@@ -12,9 +12,8 @@ const themes = {
     border: "border-neutral-200",
     ring: "ring-black/5",
     button: "border-neutral-300 hover:bg-neutral-50",
-    heroOverlay: "from-black/65 via-black/25 to-transparent",
+    heroOverlay: "from-black/65 via-black/20 to-transparent",
     badge: "bg-white/85 text-neutral-800",
-    inputBg: "bg-white text-neutral-800",
     softBg: "bg-neutral-50",
     timeText: "text-neutral-500",
   },
@@ -29,37 +28,55 @@ const themes = {
     border: "border-rose-200",
     ring: "ring-rose-200/60",
     button: "border-rose-300 hover:bg-rose-50",
-    heroOverlay: "from-pink-600/65 via-orange-400/20 to-transparent",
+    heroOverlay: "from-pink-600/65 via-orange-300/25 to-transparent",
     badge: "bg-yellow-100/90 text-rose-700",
-    inputBg: "bg-white text-neutral-800",
     softBg: "bg-rose-50",
     timeText: "text-rose-500",
   },
-  night: {
-    name: "Night",
-    pageBg: "bg-neutral-950",
-    panelBg: "bg-neutral-900",
-    sectionBg: "bg-neutral-900",
-    cardBg: "bg-neutral-900",
-    text: "text-neutral-100",
-    subtext: "text-neutral-400",
-    border: "border-neutral-700",
-    ring: "ring-white/10",
-    button: "border-neutral-600 hover:bg-neutral-800",
-    heroOverlay: "from-black/80 via-indigo-900/30 to-transparent",
-    badge: "bg-indigo-200/90 text-indigo-950",
-    inputBg: "bg-neutral-950 text-white",
-    softBg: "bg-neutral-950",
-    timeText: "text-indigo-300",
+  natural: {
+    name: "Natural",
+    pageBg: "bg-emerald-50",
+    panelBg: "bg-white",
+    sectionBg: "bg-white",
+    cardBg: "bg-white",
+    text: "text-neutral-800",
+    subtext: "text-neutral-600",
+    border: "border-emerald-200",
+    ring: "ring-emerald-200/60",
+    button: "border-emerald-300 hover:bg-emerald-50",
+    heroOverlay: "from-emerald-900/60 via-lime-700/20 to-transparent",
+    badge: "bg-emerald-100/90 text-emerald-800",
+    softBg: "bg-emerald-50",
+    timeText: "text-emerald-600",
+  },
+  sky: {
+    name: "Sky",
+    pageBg: "bg-sky-50",
+    panelBg: "bg-white",
+    sectionBg: "bg-white",
+    cardBg: "bg-white",
+    text: "text-neutral-800",
+    subtext: "text-neutral-600",
+    border: "border-sky-200",
+    ring: "ring-sky-200/60",
+    button: "border-sky-300 hover:bg-sky-50",
+    heroOverlay: "from-sky-900/65 via-cyan-500/20 to-transparent",
+    badge: "bg-sky-100/90 text-sky-800",
+    softBg: "bg-sky-50",
+    timeText: "text-sky-600",
   },
 };
 
-const tabLabels = [
+const editorTabs = [
   { key: "basic", label: "基本" },
   { key: "schedule", label: "日程" },
   { key: "packing", label: "持ち物" },
   { key: "photos", label: "Googleフォト" },
-  { key: "complete", label: "完成" },
+];
+
+const modes = [
+  { key: "edit", label: "編集モード" },
+  { key: "preview", label: "完成モード" },
 ];
 
 const defaultTrip = {
@@ -122,6 +139,7 @@ const defaultTrip = {
 function App() {
   const [trip, setTrip] = useState(defaultTrip);
   const [copied, setCopied] = useState(false);
+  const [mode, setMode] = useState("edit");
   const [activeTab, setActiveTab] = useState("basic");
 
   useEffect(() => {
@@ -149,20 +167,26 @@ function App() {
                 }))
               : defaultTrip.days,
         });
+
+        setMode("preview");
       } catch (error) {
         console.error("共有データの読み込みに失敗しました:", error);
       }
     }
   }, []);
 
-  const currentTheme = useMemo(() => {
-    return themes[trip.theme] || themes.classic;
+  const theme = useMemo(() => {
+    return previewThemes[trip.theme] || previewThemes.classic;
   }, [trip.theme]);
 
-  const inputClass = `w-full rounded-xl border px-3 py-2 text-sm ${currentTheme.border} ${currentTheme.inputBg}`;
-  const textAreaClass = `min-h-[100px] w-full rounded-xl border px-3 py-2 text-sm ${currentTheme.border} ${currentTheme.inputBg}`;
-  const smallInputClass = `w-full rounded-lg border px-3 py-2 text-sm ${currentTheme.border} ${currentTheme.inputBg}`;
-  const pillButtonClass = `rounded-full border px-4 py-2 text-sm ${currentTheme.button}`;
+  const editorInputClass =
+    "w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800";
+  const editorTextAreaClass =
+    "min-h-[100px] w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800";
+  const editorSmallInputClass =
+    "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800";
+  const editorPillClass =
+    "rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50";
 
   const updateTripField = (key, value) => {
     setTrip((prev) => ({
@@ -308,20 +332,42 @@ function App() {
     }
   };
 
+  const renderModeSwitcher = () => (
+    <div className="mb-5 flex flex-wrap gap-2">
+      {modes.map((item) => {
+        const isActive = mode === item.key;
+        return (
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => setMode(item.key)}
+            className={`rounded-full px-4 py-2 text-sm transition ${
+              isActive
+                ? "bg-neutral-900 text-white"
+                : "border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+            }`}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   const renderTabButtons = () => (
     <div className="mb-5 flex flex-wrap gap-2">
-      {tabLabels.map((tab) => {
+      {editorTabs.map((tab) => {
         const isActive = activeTab === tab.key;
         return (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
+            className={`rounded-full px-4 py-2 text-sm transition ${
               isActive
-                ? "bg-neutral-900 text-white border-neutral-900"
-                : `${currentTheme.button}`
-            } ${trip.theme === "night" && isActive ? "bg-white text-neutral-900 border-white" : ""}`}
+                ? "bg-neutral-900 text-white"
+                : "border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+            }`}
           >
             {tab.label}
           </button>
@@ -333,68 +379,81 @@ function App() {
   const renderBasicEditor = () => (
     <div className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium">タイトル</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          タイトル
+        </label>
         <input
           type="text"
           value={trip.title}
           onChange={(e) => updateTripField("title", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
           placeholder="大人のしおり"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">サブタイトル</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          サブタイトル
+        </label>
         <input
           type="text"
           value={trip.subtitle}
           onChange={(e) => updateTripField("subtitle", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
           placeholder="Sendai & Zao Trip"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">日付</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          日付
+        </label>
         <input
           type="text"
           value={trip.date}
           onChange={(e) => updateTripField("date", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
           placeholder="2026/1/24 - 2026/1/25"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">テーマ</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          完成画面のテーマ
+        </label>
         <select
           value={trip.theme}
           onChange={(e) => updateTripField("theme", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
         >
           <option value="classic">Classic</option>
           <option value="pop">Pop</option>
-          <option value="night">Night</option>
+          <option value="natural">Natural</option>
+          <option value="sky">Sky</option>
         </select>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">説明文</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          説明文
+        </label>
         <textarea
           value={trip.description}
           onChange={(e) => updateTripField("description", e.target.value)}
-          className={textAreaClass}
+          className={editorTextAreaClass}
           placeholder="旅の紹介文"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">表紙画像URL</label>
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
+          表紙画像URL
+        </label>
         <input
           type="url"
           value={trip.coverImage}
           onChange={(e) => updateTripField("coverImage", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
           placeholder="https://..."
         />
       </div>
@@ -404,17 +463,16 @@ function App() {
   const renderScheduleEditor = () => (
     <div className="space-y-6">
       {trip.days.map((day, dayIndex) => (
-        <div
-          key={dayIndex}
-          className={`rounded-2xl border p-4 ${currentTheme.border}`}
-        >
+        <div key={dayIndex} className="rounded-2xl border border-neutral-200 p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <label className="block text-sm font-medium">日程タイトル</label>
+            <label className="block text-sm font-medium text-neutral-700">
+              日程タイトル
+            </label>
             {trip.days.length > 1 && (
               <button
                 type="button"
                 onClick={() => removeDay(dayIndex)}
-                className={`${pillButtonClass} text-xs`}
+                className={`${editorPillClass} text-xs`}
               >
                 この日を削除
               </button>
@@ -425,26 +483,24 @@ function App() {
             type="text"
             value={day.dayTitle}
             onChange={(e) => updateDayTitle(dayIndex, e.target.value)}
-            className={inputClass}
+            className={editorInputClass}
           />
 
           <div className="mt-4 space-y-4">
             {day.schedule.map((item, itemIndex) => (
               <div
                 key={itemIndex}
-                className={`rounded-xl p-3 ring-1 ${
-                  trip.theme === "night"
-                    ? "bg-neutral-950 ring-neutral-800"
-                    : "bg-neutral-50 ring-neutral-200"
-                }`}
+                className="rounded-xl bg-neutral-50 p-3 ring-1 ring-neutral-200"
               >
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold">予定 {itemIndex + 1}</div>
+                  <div className="text-sm font-semibold text-neutral-800">
+                    予定 {itemIndex + 1}
+                  </div>
                   {day.schedule.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeScheduleItem(dayIndex, itemIndex)}
-                      className={`${pillButtonClass} text-xs`}
+                      className={`${editorPillClass} text-xs`}
                     >
                       削除
                     </button>
@@ -453,7 +509,9 @@ function App() {
 
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-medium">時間</label>
+                    <label className="mb-1 block text-xs font-medium text-neutral-700">
+                      時間
+                    </label>
                     <input
                       type="text"
                       value={item.time}
@@ -465,13 +523,15 @@ function App() {
                           e.target.value
                         )
                       }
-                      className={smallInputClass}
+                      className={editorSmallInputClass}
                       placeholder="11:30"
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-xs font-medium">場所</label>
+                    <label className="mb-1 block text-xs font-medium text-neutral-700">
+                      場所
+                    </label>
                     <input
                       type="text"
                       value={item.place}
@@ -483,14 +543,16 @@ function App() {
                           e.target.value
                         )
                       }
-                      className={smallInputClass}
+                      className={editorSmallInputClass}
                       placeholder="牛たんランチ"
                     />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <label className="mb-1 block text-xs font-medium">メモ</label>
+                  <label className="mb-1 block text-xs font-medium text-neutral-700">
+                    メモ
+                  </label>
                   <textarea
                     value={item.note}
                     onChange={(e) =>
@@ -501,13 +563,15 @@ function App() {
                         e.target.value
                       )
                     }
-                    className={`min-h-[80px] w-full rounded-lg border px-3 py-2 text-sm ${currentTheme.border} ${currentTheme.inputBg}`}
+                    className="min-h-[80px] w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800"
                     placeholder="お店のメモや予定"
                   />
                 </div>
 
                 <div className="mt-3">
-                  <label className="mb-1 block text-xs font-medium">リンク</label>
+                  <label className="mb-1 block text-xs font-medium text-neutral-700">
+                    リンク
+                  </label>
                   <input
                     type="url"
                     value={item.link}
@@ -519,13 +583,13 @@ function App() {
                         e.target.value
                       )
                     }
-                    className={smallInputClass}
+                    className={editorSmallInputClass}
                     placeholder="https://..."
                   />
                 </div>
 
                 <div className="mt-3">
-                  <label className="mb-1 block text-xs font-medium">
+                  <label className="mb-1 block text-xs font-medium text-neutral-700">
                     写真を選ぶ
                   </label>
                   <input
@@ -534,7 +598,7 @@ function App() {
                     onChange={(e) =>
                       handleImageUpload(dayIndex, itemIndex, e.target.files?.[0])
                     }
-                    className={`block w-full rounded-lg border px-3 py-2 text-sm ${currentTheme.border} ${currentTheme.inputBg}`}
+                    className="block w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-800"
                   />
                 </div>
 
@@ -548,7 +612,7 @@ function App() {
                     <button
                       type="button"
                       onClick={() => removeScheduleImage(dayIndex, itemIndex)}
-                      className={`${pillButtonClass} mt-3 text-xs`}
+                      className={`${editorPillClass} mt-3 text-xs`}
                     >
                       写真を削除
                     </button>
@@ -561,14 +625,14 @@ function App() {
           <button
             type="button"
             onClick={() => addScheduleItem(dayIndex)}
-            className={`${pillButtonClass} mt-4`}
+            className={`${editorPillClass} mt-4`}
           >
             ＋ この日に予定を追加
           </button>
         </div>
       ))}
 
-      <button type="button" onClick={addDay} className={`w-full ${pillButtonClass}`}>
+      <button type="button" onClick={addDay} className={`w-full ${editorPillClass}`}>
         ＋ 日程を追加
       </button>
     </div>
@@ -577,17 +641,16 @@ function App() {
   const renderPackingEditor = () => (
     <div className="space-y-4">
       {trip.packingItems.map((item, index) => (
-        <div
-          key={index}
-          className={`rounded-2xl border p-4 ${currentTheme.border}`}
-        >
+        <div key={index} className="rounded-2xl border border-neutral-200 p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold">持ち物 {index + 1}</div>
+            <div className="text-sm font-semibold text-neutral-800">
+              持ち物 {index + 1}
+            </div>
             {trip.packingItems.length > 1 && (
               <button
                 type="button"
                 onClick={() => removePackingItem(index)}
-                className={`${pillButtonClass} text-xs`}
+                className={`${editorPillClass} text-xs`}
               >
                 削除
               </button>
@@ -596,23 +659,27 @@ function App() {
 
           <div className="grid gap-3 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-medium">持ち物名</label>
+              <label className="mb-1 block text-xs font-medium text-neutral-700">
+                持ち物名
+              </label>
               <input
                 type="text"
                 value={item.name}
                 onChange={(e) => updatePackingItem(index, "name", e.target.value)}
-                className={smallInputClass}
+                className={editorSmallInputClass}
                 placeholder="財布"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium">メモ</label>
+              <label className="mb-1 block text-xs font-medium text-neutral-700">
+                メモ
+              </label>
               <input
                 type="text"
                 value={item.note}
                 onChange={(e) => updatePackingItem(index, "note", e.target.value)}
-                className={smallInputClass}
+                className={editorSmallInputClass}
                 placeholder="忘れないように"
               />
             </div>
@@ -623,7 +690,7 @@ function App() {
       <button
         type="button"
         onClick={addPackingItem}
-        className={`w-full ${pillButtonClass}`}
+        className={`w-full ${editorPillClass}`}
       >
         ＋ 持ち物を追加
       </button>
@@ -633,51 +700,22 @@ function App() {
   const renderPhotoEditor = () => (
     <div className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium">
+        <label className="mb-1 block text-sm font-medium text-neutral-700">
           Googleフォトのリンク
         </label>
         <input
           type="url"
           value={trip.photoAlbumUrl}
           onChange={(e) => updateTripField("photoAlbumUrl", e.target.value)}
-          className={inputClass}
+          className={editorInputClass}
           placeholder="https://photos.app.goo.gl/..."
         />
       </div>
 
-      <div
-        className={`rounded-2xl border p-4 text-sm leading-7 ${currentTheme.border} ${currentTheme.subtext}`}
-      >
-        Googleフォトの共有リンクをここに入れると、右側のプレビューに
+      <div className="rounded-2xl border border-neutral-200 p-4 text-sm leading-7 text-neutral-600">
+        Googleフォトの共有リンクをここに入れると、完成モードに
         <span className="font-semibold">「Googleフォトを見る」</span>
-        ボタンが出ます。
-        <br />
-        そのボタンを押すと、新しいタブでGoogleフォトを開けます。
-      </div>
-    </div>
-  );
-
-  const renderCompleteEditor = () => (
-    <div
-      className={`rounded-2xl border p-5 text-sm leading-7 ${currentTheme.border} ${currentTheme.subtext}`}
-    >
-      <p className="font-semibold">完成プレビュー</p>
-      <p className="mt-2">
-        ここでは編集というより、右側でしおり全体をまとめて確認するモードです。
-      </p>
-      <p className="mt-2">
-        友達に送る前の最終チェックにちょうどいいやつ。
-      </p>
-
-      <div className="mt-4">
-        <button type="button" onClick={copyShareUrl} className={pillButtonClass}>
-          🔗 共有URLをコピー
-        </button>
-        {copied && (
-          <p className="mt-3 text-sm text-emerald-500">
-            共有URLをコピーしました！
-          </p>
-        )}
+        ボタンが表示されます。
       </div>
     </div>
   );
@@ -692,8 +730,6 @@ function App() {
         return renderPackingEditor();
       case "photos":
         return renderPhotoEditor();
-      case "complete":
-        return renderCompleteEditor();
       default:
         return renderBasicEditor();
     }
@@ -701,22 +737,20 @@ function App() {
 
   const renderHeroSection = () => (
     <section
-      className={`overflow-hidden rounded-[28px] ${currentTheme.sectionBg} shadow-sm ring-1 ${currentTheme.ring}`}
+      className={`overflow-hidden rounded-[28px] ${theme.sectionBg} shadow-sm ring-1 ${theme.ring}`}
     >
-      <div className="relative h-[320px] w-full md:h-[420px]">
+      <div className="relative h-[320px] w-full md:h-[430px]">
         <img
           src={trip.coverImage}
           alt={trip.title}
           className="h-full w-full object-cover"
         />
-        <div
-          className={`absolute inset-0 bg-gradient-to-t ${currentTheme.heroOverlay}`}
-        />
+        <div className={`absolute inset-0 bg-gradient-to-t ${theme.heroOverlay}`} />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white md:p-8">
           <span
-            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${currentTheme.badge}`}
+            className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${theme.badge}`}
           >
-            {themes[trip.theme]?.name || "Classic"}
+            {theme.name}
           </span>
           <p className="mt-3 text-sm tracking-[0.2em] uppercase opacity-90">
             Travel Book
@@ -728,13 +762,13 @@ function App() {
       </div>
 
       <div className="p-6 md:p-8">
-        <p className={`leading-7 ${currentTheme.subtext}`}>{trip.description}</p>
+        <p className={`leading-7 ${theme.subtext}`}>{trip.description}</p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             type="button"
             onClick={copyShareUrl}
-            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${currentTheme.button}`}
+            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
           >
             🔗 共有URLをコピー
           </button>
@@ -744,7 +778,7 @@ function App() {
               href={trip.photoAlbumUrl}
               target="_blank"
               rel="noreferrer"
-              className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${currentTheme.button}`}
+              className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
             >
               📸 Googleフォトを見る
             </a>
@@ -762,7 +796,7 @@ function App() {
 
   const renderSchedulePreview = () => (
     <section
-      className={`rounded-[28px] ${currentTheme.sectionBg} p-6 shadow-sm ring-1 ${currentTheme.ring} md:p-8`}
+      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
     >
       <h2 className="mb-6 text-2xl font-bold">日程</h2>
 
@@ -775,11 +809,11 @@ function App() {
               {day.schedule.map((item, itemIndex) => (
                 <div
                   key={itemIndex}
-                  className={`overflow-hidden rounded-2xl border ${currentTheme.border} ${currentTheme.cardBg}`}
+                  className={`overflow-hidden rounded-2xl border ${theme.border} ${theme.cardBg}`}
                 >
                   <div className="grid gap-0 md:grid-cols-[110px_1fr]">
                     <div
-                      className={`border-b px-4 py-4 text-sm font-semibold md:border-b-0 md:border-r ${currentTheme.border} ${currentTheme.timeText}`}
+                      className={`border-b px-4 py-4 text-sm font-semibold md:border-b-0 md:border-r ${theme.border} ${theme.timeText}`}
                     >
                       {item.time || "時間未定"}
                     </div>
@@ -791,7 +825,7 @@ function App() {
 
                       {item.note && (
                         <p
-                          className={`mt-2 whitespace-pre-wrap text-sm leading-6 ${currentTheme.subtext}`}
+                          className={`mt-2 whitespace-pre-wrap text-sm leading-6 ${theme.subtext}`}
                         >
                           {item.note}
                         </p>
@@ -803,7 +837,7 @@ function App() {
                             href={item.link}
                             target="_blank"
                             rel="noreferrer"
-                            className={`inline-flex rounded-full border px-3 py-1 text-xs ${currentTheme.button}`}
+                            className={`inline-flex rounded-full border px-3 py-1 text-xs ${theme.button}`}
                           >
                             詳細を見る
                           </a>
@@ -832,7 +866,7 @@ function App() {
 
   const renderPackingPreview = () => (
     <section
-      className={`rounded-[28px] ${currentTheme.sectionBg} p-6 shadow-sm ring-1 ${currentTheme.ring} md:p-8`}
+      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
     >
       <h2 className="mb-5 text-2xl font-bold">持ち物</h2>
 
@@ -840,13 +874,13 @@ function App() {
         {trip.packingItems.map((item, index) => (
           <div
             key={index}
-            className={`rounded-2xl border p-4 ${currentTheme.border} ${currentTheme.cardBg}`}
+            className={`rounded-2xl border p-4 ${theme.border} ${theme.cardBg}`}
           >
             <div className="text-base font-semibold">
               {item.name || `持ち物 ${index + 1}`}
             </div>
             {item.note && (
-              <p className={`mt-2 text-sm leading-6 ${currentTheme.subtext}`}>
+              <p className={`mt-2 text-sm leading-6 ${theme.subtext}`}>
                 {item.note}
               </p>
             )}
@@ -858,125 +892,158 @@ function App() {
 
   const renderGooglePhotoPreview = () => (
     <section
-      className={`rounded-[28px] ${currentTheme.sectionBg} p-6 shadow-sm ring-1 ${currentTheme.ring} md:p-8`}
+      className={`rounded-[28px] ${theme.sectionBg} p-6 shadow-sm ring-1 ${theme.ring} md:p-8`}
     >
       <h2 className="mb-3 text-2xl font-bold">Googleフォト</h2>
 
       {trip.photoAlbumUrl ? (
         <>
-          <p className={`mb-4 text-sm leading-6 ${currentTheme.subtext}`}>
+          <p className={`mb-4 text-sm leading-6 ${theme.subtext}`}>
             思い出アルバムをGoogleフォトで開けます。
           </p>
           <a
             href={trip.photoAlbumUrl}
             target="_blank"
             rel="noreferrer"
-            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${currentTheme.button}`}
+            className={`inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm ${theme.button}`}
           >
             📸 Googleフォトを見る
           </a>
         </>
       ) : (
-        <p className={`text-sm leading-6 ${currentTheme.subtext}`}>
+        <p className={`text-sm leading-6 ${theme.subtext}`}>
           まだGoogleフォトのリンクが入っていません。
         </p>
       )}
     </section>
   );
 
-  const renderPreviewContent = () => {
-    if (activeTab === "basic") {
-      return (
-        <>
-          {renderHeroSection()}
-        </>
-      );
-    }
-
-    if (activeTab === "schedule") {
-      return (
-        <>
-          {renderSchedulePreview()}
-        </>
-      );
-    }
-
-    if (activeTab === "packing") {
-      return (
-        <>
-          {renderPackingPreview()}
-        </>
-      );
-    }
-
-    if (activeTab === "photos") {
-      return (
-        <>
-          {renderGooglePhotoPreview()}
-        </>
-      );
-    }
-
-    return (
-      <>
-        {renderHeroSection()}
-        {renderSchedulePreview()}
-        {renderPackingPreview()}
-        {renderGooglePhotoPreview()}
-      </>
-    );
-  };
-
   return (
-    <div
-      className={`min-h-screen ${currentTheme.pageBg} ${currentTheme.text} transition-colors duration-300`}
-    >
+    <div className={mode === "edit" ? "min-h-screen bg-neutral-100 text-neutral-800" : `min-h-screen ${theme.pageBg} ${theme.text} transition-colors duration-300`}>
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-          <aside
-            className={`rounded-3xl ${currentTheme.panelBg} p-5 shadow-sm ring-1 ${currentTheme.ring}`}
-          >
-            <h1 className="mb-4 text-2xl font-bold">旅しおり編集</h1>
+        <div className="mb-6">
+          {renderModeSwitcher()}
+        </div>
 
-            {renderTabButtons()}
+        {mode === "edit" ? (
+          <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+            <aside className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <h1 className="mb-4 text-2xl font-bold">旅しおり編集</h1>
+              {renderTabButtons()}
+              <div className="space-y-4">{renderEditorContent()}</div>
+            </aside>
 
-            <div className="space-y-4">{renderEditorContent()}</div>
-          </aside>
+            <main className="space-y-6">
+              <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+                <h2 className="text-2xl font-bold text-neutral-900">編集メモ</h2>
+                <div className="mt-4 space-y-3 text-sm leading-7 text-neutral-600">
+                  <p>
+                    ここは編集専用の画面です。入力や画像追加に集中できるように、
+                    あえて完成版は分けています。
+                  </p>
+                  <p>
+                    右上の <span className="font-semibold">完成モード</span> を押すと、
+                    当日に見やすいしおり表示に切り替わります。
+                  </p>
+                  <p>
+                    共有URLを送った相手は、最初から完成モードで開くようになっています。
+                  </p>
+                </div>
 
-          <main className="space-y-6">
-            <div
-              className={`rounded-3xl ${currentTheme.panelBg} p-4 shadow-sm ring-1 ${currentTheme.ring}`}
-            >
-              <div className="flex flex-wrap gap-2">
-                {tabLabels.map((tab) => {
-                  const isActive = activeTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      type="button"
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`rounded-full border px-4 py-2 text-sm transition ${
-                        isActive
-                          ? "bg-neutral-900 text-white border-neutral-900"
-                          : `${currentTheme.button}`
-                      } ${trip.theme === "night" && isActive ? "bg-white text-neutral-900 border-white" : ""}`}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMode("preview")}
+                    className="rounded-full bg-neutral-900 px-5 py-2 text-sm text-white hover:opacity-90"
+                  >
+                    完成モードで見る
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={copyShareUrl}
+                    className="rounded-full border border-neutral-300 px-5 py-2 text-sm hover:bg-neutral-50"
+                  >
+                    🔗 共有URLをコピー
+                  </button>
+                </div>
+
+                {copied && (
+                  <p className="mt-3 text-sm text-emerald-600">
+                    共有URLをコピーしました！
+                  </p>
+                )}
+              </section>
+
+              <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
+                <h2 className="text-xl font-bold text-neutral-900">選べる完成テーマ</h2>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {Object.values(previewThemes).map((item) => (
+                    <div
+                      key={item.name}
+                      className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4"
                     >
-                      {tab.label}
-                    </button>
-                  );
-                })}
+                      <div className="text-base font-semibold text-neutral-900">
+                        {item.name}
+                      </div>
+                      <p className="mt-2 text-sm text-neutral-600">
+                        完成モードに切り替えたときの表示テーマです。
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </main>
+          </div>
+        ) : (
+          <main className="space-y-6">
+            <div className={`rounded-3xl ${theme.panelBg} p-4 shadow-sm ring-1 ${theme.ring}`}>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMode("edit")}
+                  className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                >
+                  編集モードに戻る
+                </button>
+
+                <button
+                  type="button"
+                  onClick={copyShareUrl}
+                  className={`rounded-full border px-4 py-2 text-sm ${theme.button}`}
+                >
+                  🔗 共有URLをコピー
+                </button>
+
+                {trip.photoAlbumUrl && (
+                  <a
+                    href={trip.photoAlbumUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`rounded-full border px-4 py-2 text-sm ${theme.button}`}
+                  >
+                    📸 Googleフォトを見る
+                  </a>
+                )}
               </div>
+
+              {copied && (
+                <p className="mt-3 text-sm text-emerald-500">
+                  共有URLをコピーしました！
+                </p>
+              )}
             </div>
 
-            {renderPreviewContent()}
+            {renderHeroSection()}
+            {renderSchedulePreview()}
+            {renderPackingPreview()}
+            {renderGooglePhotoPreview()}
 
-            <footer
-              className={`pb-8 pt-2 text-center text-xs ${currentTheme.subtext}`}
-            >
+            <footer className={`pb-8 pt-2 text-center text-xs ${theme.subtext}`}>
               <p>©2026 Rela-Spo Komo</p>
             </footer>
           </main>
-        </div>
+        )}
       </div>
     </div>
   );
