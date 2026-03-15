@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* 土台デザイン（今日やるやつ） */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+}
